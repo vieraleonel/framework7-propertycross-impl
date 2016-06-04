@@ -1,0 +1,26 @@
+{
+  "name": "framework7-propertycross-impl",
+  "version": "1.0.0",
+  "description": "Implementación de PropertyCross en F7",
+  "scripts": {
+    "copy:f7": "copyfiles node_modules/framework7/dist www/assets/framework7"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vieraleonel/framework7-propertycross-impl.git"
+  },
+  "keywords": [
+    "cordova",
+    "propertycross",
+    "phonegap",
+    "framework7",
+    "mobile",
+    "hybrid"
+  ],
+  "author": "Leonel Viera",
+  "license": "SEE LICENSE IN LICENSE",
+  "homepage": "https://github.com/vieraleonel/framework7-propertycross-impl#readme",
+  "dependencies": {
+    "framework7": "^1.4.2"
+  }
+}

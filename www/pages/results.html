@@ -1,0 +1,62 @@
+<!-- We don't need full layout in this file because this page will be parsed with Ajax. It is just enough to put here .navbar and .page-->
+ 
+{{#if @global.ios}}
+<!-- Top Navbar-->
+<div class="navbar">
+    <div class="navbar-inner">
+        <div class="left">
+            <a href="#" class="back icon-only"><i class="icon icon-back"></i></a>
+        </div>
+        <div class="center">{{showing}} of {{results}} matches</div>
+    </div>
+</div>
+{{/if}}
+
+<div class="page" data-page="results">
+    {{#if @global.android}}
+        <!-- Fixed navbar for Material theme -->
+        <div class="navbar">
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="back icon-only"><i class="icon icon-back"></i></a>
+                </div>
+                <div class="center">{{showing}} of {{results}} matches</div>
+            </div>
+        </div>
+    {{/if}}
+    
+    <div class="page-content">
+        <div class="list-block media-list">
+            <ul id="results-list">
+                {{#each properties}}
+                    <li>
+                        <a href="#" class="item-link item-content property-item" data-index="{{@index}}">
+                            <div class="item-media">
+                                <img src="{{thumb_url}}" width="80">
+                            </div>
+                            <div class="item-inner">
+                                <div class="item-title-row">
+                                    <div class="item-title">{{price_formatted}}</div>
+                                </div>
+                                <div class="item-text">{{title}}</div>
+                            </div>
+                        </a>
+                    </li>
+                {{/each}}
+
+                {{#if more}}
+                    <li>
+                        <a id="load-more-results" href="#" class="item-link item-content">
+                            <div class="item-inner">
+                                <div class="item-title-row">
+                                    <div class="item-title">Load more …</div>
+                                </div>
+                                <div class="item-text">Results for {{searchTerm}}, showing {{showing}} of {{results}} properties</div>
+                            </div>
+                        </a>
+                    </li>
+                {{/if}}
+            </ul>
+        </div>
+    </div>
+</div> 

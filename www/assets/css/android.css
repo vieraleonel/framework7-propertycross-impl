@@ -1,0 +1,8 @@
+#search-form ul:before {
+    background: none;
+}
+
+.android-hidden {
+    visibility: none;
+    display: none;
+}

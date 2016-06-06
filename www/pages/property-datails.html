@@ -1,0 +1,49 @@
+<!-- We don't need full layout in this file because this page will be parsed with Ajax. It is just enough to put here .navbar and .page-->
+ 
+{{#if @global.ios}}
+<!-- Top Navbar-->
+<div class="navbar">
+    <div class="navbar-inner">
+        <div class="left">
+            <a href="#" class="back icon-only">
+                <i class="icon icon-back"></i>
+            </a>
+        </div>
+        <div class="center">Property Details</div>
+        <div class="right">
+            <a href="#" class="link icon-only fav-property">
+                <i class="fa fa-star-o fa-lg"></i>
+            </a>
+        </div>
+    </div>
+</div>  
+{{/if}}
+
+<div class="page" data-page="property-details" style="background-color: white;">
+    <!-- Fixed navbar for Material theme -->
+    {{#if @global.android}}
+        <div class="navbar">
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="back icon-only"><i class="icon icon-back"></i></a>
+                </div>
+                <div class="center">Property Details</div>
+            </div>
+        </div>
+
+        <!-- Floating Action Button -->
+        <a href="#" class="floating-button fav-property color-pink">
+            <i class="fa fa-star-o fa-2x"></i>
+        </a>
+    {{/if}}
+    
+    <div class="page-content">
+        <div class="content-block">
+            <h2 style="margin-bottom: -15px;">{{price_formatted}}</h2>
+            <p><small>{{trimPropertyTitle title}}</small></p>
+            <img src="{{img_url}}" style="width: 100%">
+            <p>{{bedroom_number}} beeds, {{bathroom_number}} bathrooms</p>
+            <p>{{summary}}</p>
+        </div>
+    </div>
+</div> 

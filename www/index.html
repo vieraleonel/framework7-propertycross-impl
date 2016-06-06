@@ -23,6 +23,9 @@
     -->
     <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: 'unsafe-inline' https://ssl.gstatic.com; style-src 'self' 'unsafe-inline'; media-src *" /> -->
     <title>PropertyCross</title>
+
+    <link rel="stylesheet" href="assets/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 
 <body>
@@ -35,47 +38,92 @@
     <!-- Views -->
     <div class="views">
         <!-- Your main view, should have "view-main" class -->
-        <div class="view view-main">
+        <div class="view view-main navbar-fixed">
 
-            <!-- Top Navbar-->
-            <div class="navbar">
-                <div class="navbar-inner">
-                    <!-- We need cool sliding animation on title element, so we have additional "sliding" class -->
-                    <div class="center sliding">PropertyCross</div>
-                    <div class="right">
-                        <!-- 
-                        Right link contains only icon - additional "icon-only" class
-                        Additional "open-panel" class tells app to open panel when we click on this link
-                        -->
-                        <a href="pages/favourites.html" class="link">Faves</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Pages container, because we use fixed-through navbar and toolbar, it has additional appropriate classes-->
-            <div class="pages navbar-through">
+            <div class="pages">
                 <!-- Page, "data-page" contains page name -->
-                <div class="page">
+                <div class="page" data-page="main">
+                    
+                    <!-- Top Navbar-->
+                    <div class="navbar">
+                        <div class="navbar-inner">
+                            <div class="center">PropertyCross</div>
+                            <div class="right">
+                                <a href="pages/favourites.html" class="link">Faves</a>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Scrollable page content -->
                     <div class="page-content">
-                        <p>Page content goes here</p>
-                        <!-- Link to another page -->
-                        <a href="about.html">About app</a>
+                        <div class="content-block">
+                            Use the form below to search for houses to buy. You can search by place-name, postcode, or click 'My location', to search in your current location!
+                        </div>
+                        <div id="search-form" class="list-block">
+                            <div class="content-block">
+                                <ul>
+                                    <li>
+                                        <div class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-input">
+                                                    <input id="search-text" type="text" name="search" placeholder="search">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                
+                        <div id="search-buttons" class="content-block">
+                            <div class="row">
+                                <div class="col-45">
+                                    <a id="do-search" href="#" class="button button-big button-fill color-green">Go</a>
+                                </div>
+                                <div class="col-45">
+                                    <a href="#" class="button button-big button-fill">My location</a>
+                                </div>
+                            </div>   
+                        </div>
+
+                        <div id="search-progress" class="content-block hidden">
+                            <p><span class="progressbar-infinite"></span></p>
+                        </div>
+
+                        <div class="content-block-title">Recent searches:</div>
+                        <div class="list-block">
+                            <ul>
+                                <li class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">Item with badge</div>
+                                        <div class="item-after"><span class="badge">5</span></div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
 
         </div>
     </div>
-    <!-- Path to Framework7 Library JS-->
+
+    <!-- PouchDB 
+    <script type="text/javascript" src="assets/pouchdb/pouchdb.min.js"></script>
+    <script type="text/javascript" src="assets/pouchdb-find/pouchdb.find.min.js"></script>
+    -->
+
+    <!-- Framework7 -->
     <script type="text/javascript" src="assets/framework7/js/framework7.min.js"></script>
     
+    <!-- init.js -->
     <script type="text/javascript">
-        // init.js
         
         (function (F7, T7, D7) {
+            'use strict';
+
             window.isAndroid = F7.prototype.device.android === true;
-            window.isIos = F7.prototype.device.ios === true;
+            window.isIos     = F7.prototype.device.ios === true;
 
             T7.global = {
                 android: isAndroid,
@@ -85,41 +133,103 @@
             window['$$'] = D7;
 
             if (isAndroid) {
-                Dom7('head').append(
+                $$('head').append(
                     '<link rel="stylesheet" href="assets/framework7/css/framework7.material.min.css">' +
-                    '<link rel="stylesheet" href="assets/framework7/css/framework7.material.colors.min.css">'
+                    '<link rel="stylesheet" href="assets/framework7/css/framework7.material.colors.min.css">' +
+                    '<link rel="stylesheet" href="assets/css/android.css">'
                 );
-
-                 // Change class
-                $$('.view.navbar-through').removeClass('navbar-through').addClass('navbar-fixed');
-                // And move Navbar into Page
-                $$('.view .navbar').prependTo('.view .page');
             }
             else {
-                Dom7('head').append(
+                $$('head').append(
                     '<link rel="stylesheet" href="assets/framework7/css/framework7.ios.min.css">' +
-                    '<link rel="stylesheet" href="assets/framework7/css/framework7.ios.colors.min.css">'
+                    '<link rel="stylesheet" href="assets/framework7/css/framework7.ios.colors.min.css">' +
+                    '<link rel="stylesheet" href="assets/css/ios.css">'  
                 );
+
+                // Change class
+                $$('.view.navbar-fixed').removeClass('navbar-fixed').addClass('navbar-through');
+
+                // android navbar
+                $$('.navbar').prependTo('.view');
             }
+
+            // DB
+            // window.db = {
+            //     recent: new PouchDB('recent')
+            // };
         })(Framework7, Template7, Dom7);
     </script>
 
-
+    <script type="text/javascript" src="assets/js/nestoria-api.js"></script>
+    
+    <!-- app.js -->
     <script>
-        // Initialize app
-        var myApp = new Framework7({
-            material: isAndroid ? true : false,
-            pushState: true,
-            template7Pages: true
-        });
-        
-        // Add view
-        var mainView = myApp.addView('.view-main', {
-            // Because we want to use dynamic navbar, we need to enable it for this view:
-            dynamicNavbar: true
-        });
+        (function (Framework7) {
+            'use strict';
+
+            // Initialize app
+            window.app = new Framework7({
+                material: isAndroid ? true : false,
+                //pushState: true,
+                template7Pages: true
+            });
+            
+            // Add view
+            window.mainView = app.addView('.view-main', {
+                // Because we want to use dynamic navbar, we need to enable it for this view:
+                dynamicNavbar: true
+            });
+        })(Framework7);
     </script>
-  </body>
+
+    <script type="text/javascript" src="assets/js/main.js"></script>
+    <script type="text/javascript" src="assets/js/results.js"></script>
+
+    <!-- property-detail.js -->
+    <script type="text/javascript">
+        (function (T7, app) {
+            'use strict';
+
+            T7.registerHelper('trimPropertyTitle', function(title){
+                var split = title.split(',');
+                
+                if (split.length > 1) {
+                    return split[0] + ', ' + split[1];
+                } else {
+                    return split[0];
+                }
+            });
+
+            function toggleFav() {
+                var $$elem = $$('.fav-property i');
+
+                if ($$elem.hasClass('fa-star-o')) {
+                    $$elem.removeClass('fa-star-o');
+                    $$elem.addClass('fa-star');
+                } else {
+                    $$elem.removeClass('fa-star');
+                    $$elem.addClass('fa-star-o');
+                }
+            }
+
+            app.onPageInit('property-details', function(page) {
+                $$('.fav-property').on('click', function(event){
+                    event.preventDefault();
+
+                    toggleFav();
+                });
+            });
+        })(Template7, app);   
+    </script>
+
+    <!-- 
+        TODO:
+        ===========
+        - Intial page (gps, errores, recent)
+        - Favourites page
+        - Error en resutls loading more
+        - Ver "back" para android (físico y navbar)
+    -->
 </body>
 
 </html>

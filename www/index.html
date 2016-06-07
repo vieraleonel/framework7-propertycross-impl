@@ -49,7 +49,7 @@
                         <div class="navbar-inner">
                             <div class="center">PropertyCross</div>
                             <div class="right">
-                                <a href="pages/favourites.html" class="link">Faves</a>
+                                <a href="#" class="link">Faves</a>
                             </div>
                         </div>
                     </div>
@@ -89,29 +89,87 @@
                         <div id="search-progress" class="content-block hidden">
                             <p><span class="progressbar-infinite"></span></p>
                         </div>
-
-                        <div class="content-block-title">Recent searches:</div>
-                        <div class="list-block">
-                            <ul>
-                                <li class="item-content">
-                                    <div class="item-inner">
-                                        <div class="item-title">Item with badge</div>
-                                        <div class="item-after"><span class="badge">5</span></div>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
+                        
+                        <div class="state-place"></div>
                 </div>
             </div>
 
         </div>
     </div>
 
-    <!-- PouchDB 
-    <script type="text/javascript" src="assets/pouchdb/pouchdb.min.js"></script>
-    <script type="text/javascript" src="assets/pouchdb-find/pouchdb.find.min.js"></script>
-    -->
+    <script id="recent-searchs-template" type="text/template7">
+        <div class="content-block-title">Recent searches:</div>
+            <div class="list-block">
+                <ul class="recent-searchs">
+                    {{#each searchs}}
+                        <li class="item-content">
+                            <div class="item-inner">
+                                <div class="item-title">{{term}}</div>
+                                <div class="item-after"><span class="badge">{{results}}</span></div>
+                            </div>
+                        </li>
+                    {{/each}}
+                </ul>
+            </div>
+        </div>
+    </script>
+    
+    <script type="text/javascript" src="assets/lodash/lodash.min.js"></script>
+
+    <!-- storage -->
+    <script type="text/javascript" src="assets/localforage/localforage.min.js"></script>
+    <script type="text/javascript">
+        var storageService = (function(localforage, _){
+            var service = {};
+
+            function createRecentSearchs(search) {
+                search.date = new Date().toISOString();
+                return [search];
+            }
+
+            function addSearch(recentSearchs, search) {
+
+                // try to find term
+                var index = _.findIndex(recentSearchs, ['term', search.term]);
+                
+                // update date or insert
+                if (index > -1) {
+                    recentSearchs[index].date = new Date().toISOString();
+                }
+                else {
+                    search.date = new Date().toISOString();
+                    recentSearchs.push(search);
+                }
+
+                // order
+                recentSearchs = _.reverse(_.sortBy(recentSearchs, ['date']));
+                
+                // persit only 6 elements
+                localforage.setItem('recentSearchs', _.slice(recentSearchs, 0, 6));
+            }
+
+            service.addRecentSearch = function(search) {
+                localforage.getItem('recentSearchs')
+                    .then(function(recentSearchs){
+                        if (recentSearchs === null) {
+                            localforage.setItem('recentSearchs', createRecentSearchs(search));
+                        } else {
+                            addSearch(recentSearchs, search);
+                        }
+                    });
+            };
+
+            service.getRecentSearchs = function() {
+                return localforage.getItem('recentSearchs');
+            };
+
+            service.destroyRecentSearchs = function() {
+                localforage.setItem('recentSearchs', null);
+            }
+
+            return service;
+        })(localforage, _);
+    </script>
 
     <!-- Framework7 -->
     <script type="text/javascript" src="assets/framework7/js/framework7.min.js"></script>
@@ -152,11 +210,6 @@
                 // android navbar
                 $$('.navbar').prependTo('.view');
             }
-
-            // DB
-            // window.db = {
-            //     recent: new PouchDB('recent')
-            // };
         })(Framework7, Template7, Dom7);
     </script>
 
@@ -164,11 +217,21 @@
     
     <!-- app.js -->
     <script>
-        (function (Framework7) {
+        (function (F7, T7, $$, ss) {
             'use strict';
 
+            var template = $$('#recent-searchs-template').html();
+            window.recentSearchsCompiled = T7.compile(template);
+
+            ss.getRecentSearchs()
+                .then(function(recentSearchs){
+                    window.rr = recentSearchs;
+                    var html = recentSearchsCompiled({searchs: recentSearchs});
+                    $$('.state-place').html(html);
+                });
+            
             // Initialize app
-            window.app = new Framework7({
+            window.app = new F7({
                 material: isAndroid ? true : false,
                 //pushState: true,
                 template7Pages: true
@@ -179,7 +242,7 @@
                 // Because we want to use dynamic navbar, we need to enable it for this view:
                 dynamicNavbar: true
             });
-        })(Framework7);
+        })(Framework7, Template7, Dom7, storageService);
     </script>
 
     <script type="text/javascript" src="assets/js/main.js"></script>

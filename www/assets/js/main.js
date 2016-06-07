@@ -1,4 +1,4 @@
-(function (app, $$, ns) {
+(function (app, $$, ss, ns) {
     'use strict';
 
     function showSearchProgress() {
@@ -36,6 +36,11 @@
                         properties: data.response.listings
                     }
 
+                    ss.addRecentSearch({
+                        term: searchTerm,
+                        results: data.response.total_results
+                    });
+
                     mainView.router.loadPage('pages/results.html');
                 } else {
                     alert(error);
@@ -46,26 +51,6 @@
                 showSearchButtons();
             }
         );
-
-        // var search = {
-        //     _id: new Date().toISOString(),
-        //     term: searchTerm,
-        //     results: 0,
-        // };
-          
-        // db.get(searchTerm).then(function(doc) {
-            
-        //     search._rev = doc._rev;
-
-        //     db.put(search)
-        //       .then(function(response){console.log(response)})
-        //       .catch(function(err){console.log(err)});
-
-        // }).catch(function (err) {
-        //     db.put(search)
-        //       .then(function(response){console.log(response)})
-        //       .catch(function(err){console.log(err)});
-        // });
     });
 
     app.onPageBeforeInit('main', function(page) {
@@ -73,4 +58,13 @@
             $$('.page[data-page=main] .navbar').remove();
         }
     });
-})(app, Dom7, nestoriaService);
+
+    app.onPageBeforeAnimation('main', function(page){
+        ss.getRecentSearchs()
+            .then(function(recentSearchs){
+                window.rr = recentSearchs;
+                var html = recentSearchsCompiled({searchs: recentSearchs});
+                $$('.state-place').html(html);
+            });
+    });
+})(app, Dom7, storageService, nestoriaService);

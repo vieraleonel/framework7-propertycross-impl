@@ -118,172 +118,18 @@
 
     <!-- storage -->
     <script type="text/javascript" src="assets/localforage/localforage.min.js"></script>
-    <script type="text/javascript">
-        var storageService = (function(localforage, _){
-            var service = {};
-
-            function createRecentSearchs(search) {
-                search.date = new Date().toISOString();
-                return [search];
-            }
-
-            function addSearch(recentSearchs, search) {
-
-                // try to find term
-                var index = _.findIndex(recentSearchs, ['term', search.term]);
-                
-                // update date or insert
-                if (index > -1) {
-                    recentSearchs[index].date = new Date().toISOString();
-                }
-                else {
-                    search.date = new Date().toISOString();
-                    recentSearchs.push(search);
-                }
-
-                // order
-                recentSearchs = _.reverse(_.sortBy(recentSearchs, ['date']));
-                
-                // persit only 6 elements
-                localforage.setItem('recentSearchs', _.slice(recentSearchs, 0, 6));
-            }
-
-            service.addRecentSearch = function(search) {
-                localforage.getItem('recentSearchs')
-                    .then(function(recentSearchs){
-                        if (recentSearchs === null) {
-                            localforage.setItem('recentSearchs', createRecentSearchs(search));
-                        } else {
-                            addSearch(recentSearchs, search);
-                        }
-                    });
-            };
-
-            service.getRecentSearchs = function() {
-                return localforage.getItem('recentSearchs');
-            };
-
-            service.destroyRecentSearchs = function() {
-                localforage.setItem('recentSearchs', null);
-            }
-
-            return service;
-        })(localforage, _);
-    </script>
+    <script type="text/javascript" src="assets/js/storage.js"></script>
 
     <!-- Framework7 -->
     <script type="text/javascript" src="assets/framework7/js/framework7.min.js"></script>
     
-    <!-- init.js -->
-    <script type="text/javascript">
-        
-        (function (F7, T7, D7) {
-            'use strict';
-
-            window.isAndroid = F7.prototype.device.android === true;
-            window.isIos     = F7.prototype.device.ios === true;
-
-            T7.global = {
-                android: isAndroid,
-                ios: isIos
-            };
-
-            window['$$'] = D7;
-
-            if (isAndroid) {
-                $$('head').append(
-                    '<link rel="stylesheet" href="assets/framework7/css/framework7.material.min.css">' +
-                    '<link rel="stylesheet" href="assets/framework7/css/framework7.material.colors.min.css">' +
-                    '<link rel="stylesheet" href="assets/css/android.css">'
-                );
-            }
-            else {
-                $$('head').append(
-                    '<link rel="stylesheet" href="assets/framework7/css/framework7.ios.min.css">' +
-                    '<link rel="stylesheet" href="assets/framework7/css/framework7.ios.colors.min.css">' +
-                    '<link rel="stylesheet" href="assets/css/ios.css">'  
-                );
-
-                // Change class
-                $$('.view.navbar-fixed').removeClass('navbar-fixed').addClass('navbar-through');
-
-                // android navbar
-                $$('.navbar').prependTo('.view');
-            }
-        })(Framework7, Template7, Dom7);
-    </script>
-
+    <script type="text/javascript" src="assets/js/init.js"></script>
     <script type="text/javascript" src="assets/js/nestoria-api.js"></script>
     
-    <!-- app.js -->
-    <script>
-        (function (F7, T7, $$, ss) {
-            'use strict';
-
-            var template = $$('#recent-searchs-template').html();
-            window.recentSearchsCompiled = T7.compile(template);
-
-            ss.getRecentSearchs()
-                .then(function(recentSearchs){
-                    window.rr = recentSearchs;
-                    var html = recentSearchsCompiled({searchs: recentSearchs});
-                    $$('.state-place').html(html);
-                });
-            
-            // Initialize app
-            window.app = new F7({
-                material: isAndroid ? true : false,
-                //pushState: true,
-                template7Pages: true
-            });
-            
-            // Add view
-            window.mainView = app.addView('.view-main', {
-                // Because we want to use dynamic navbar, we need to enable it for this view:
-                dynamicNavbar: true
-            });
-        })(Framework7, Template7, Dom7, storageService);
-    </script>
-
+    <script type="text/javascript" src="assets/js/app.js"></script>
     <script type="text/javascript" src="assets/js/main.js"></script>
     <script type="text/javascript" src="assets/js/results.js"></script>
-
-    <!-- property-detail.js -->
-    <script type="text/javascript">
-        (function (T7, app) {
-            'use strict';
-
-            T7.registerHelper('trimPropertyTitle', function(title){
-                var split = title.split(',');
-                
-                if (split.length > 1) {
-                    return split[0] + ', ' + split[1];
-                } else {
-                    return split[0];
-                }
-            });
-
-            function toggleFav() {
-                var $$elem = $$('.fav-property i');
-
-                if ($$elem.hasClass('fa-star-o')) {
-                    $$elem.removeClass('fa-star-o');
-                    $$elem.addClass('fa-star');
-                } else {
-                    $$elem.removeClass('fa-star');
-                    $$elem.addClass('fa-star-o');
-                }
-            }
-
-            app.onPageInit('property-details', function(page) {
-                $$('.fav-property').on('click', function(event){
-                    event.preventDefault();
-
-                    toggleFav();
-                });
-            });
-        })(Template7, app);   
-    </script>
+    <script type="text/javascript" src="assets/js/property-details.js"></script>
 
     <!-- 
         TODO:

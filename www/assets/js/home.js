@@ -1,4 +1,4 @@
-(function (app, $$, ss, ns) {
+(function (app, $$, ss, ps) {
     'use strict';
 
     function showSearchProgress() {
@@ -18,7 +18,7 @@
 
         var searchTerm = $$('#search-text').val();
 
-        ns.searchProperties(
+        ps.searchProperties(
             searchTerm, 1, 
             function(data, status, xhr) {
 
@@ -41,7 +41,7 @@
                         results: data.response.total_results
                     });
 
-                    mainView.router.loadPage('pages/results.html');
+                    mainView.router.loadPage('pages/results/results.html');
                 } else {
                     alert(error);
                 }
@@ -67,4 +67,4 @@
                 $$('.state-place').html(html);
             });
     });
-})(app, Dom7, storageService, nestoriaService);
+})(app, Dom7, storageService, propertiesService);

@@ -1,4 +1,4 @@
-(function($$, T7, app, ns) {
+(function($$, T7, app, ps) {
     'use strict';
 
     /**
@@ -11,7 +11,7 @@
 
     function loadMore() {
         if (app.template7Data['page:results'].page < app.template7Data['page:results'].pages) {
-            ns.searchProperties(
+            ps.searchProperties(
                 app.template7Data['page:results'].searchTerm, 
                 getNextPage(), 
                 function(data, status, xhr) {
@@ -39,7 +39,7 @@
         $$('#results-list').on('click', '.property-item', function(event) {
             var index = $$(this).data('index');
             app.template7Data['page:property-details'] = app.template7Data['page:results'].properties[index];
-            mainView.loadPage('pages/property-datails.html');
+            mainView.loadPage('pages/property-details/property-datails.html');
         });
 
         $$('#load-more-results').on('click', function(event){
@@ -50,4 +50,4 @@
             loadMore();
         }); 
     });
-})(Dom7, Template7, app, nestoriaService);
+})(Dom7, Template7, app, propertiesService);

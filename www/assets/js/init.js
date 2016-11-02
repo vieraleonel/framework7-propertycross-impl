@@ -1,4 +1,4 @@
-(function (F7, T7, D7) {
+(function (F7, T7, D7, ss) {
     'use strict';
 
     window.isAndroid = F7.prototype.device.android === true;
@@ -54,4 +54,4 @@
         // Because we want to use dynamic navbar, we need to enable it for this view:
         dynamicNavbar: true
     });
-})(Framework7, Template7, Dom7);
+})(Framework7, Template7, Dom7, storageService);

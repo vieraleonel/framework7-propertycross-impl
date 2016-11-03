@@ -2,13 +2,11 @@
     'use strict';
 
     function showSearchProgress() {
-        $$('#search-buttons').addClass('hidden');
-        $$('#search-progress').removeClass('hidden');
+        app.showPreloader();
     }
 
     function showSearchButtons() {
-        $$('#search-buttons').removeClass('hidden');
-        $$('#search-progress').addClass('hidden');
+        app.hidePreloader();
     }
 
     $$('.view-main').on('click', '#do-search', function(event) {

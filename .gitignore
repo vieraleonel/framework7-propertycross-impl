@@ -43,3 +43,9 @@ node_modules
 ### VSCODE ###
 jsconfig.json
 .vscode
+
+### NPM scripts ###
+www/assets/font-awesome
+www/assets/localforage
+www/assets/framework7
+www/assets/lodash

@@ -1,10 +1,7 @@
 {
   "name": "framework7-propertycross-impl",
   "version": "1.0.0",
-  "description": "Implementación de PropertyCross en F7",
-  "scripts": {
-    "copy:f7": "copyfiles node_modules/framework7/dist www/assets/framework7"
-  },
+  "description": "An implementation of PropertyCross using Framework7",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/vieraleonel/framework7-propertycross-impl.git"
@@ -25,5 +22,18 @@
     "framework7": "^1.4.2",
     "localforage": "^1.4.2",
     "lodash": "^4.13.1"
+  },
+  "devDependencies": {
+    "copyfiles": "^1.0.0",
+    "npm-run-all": "^3.1.1",
+    "rimraf": "^2.5.4"
+  },
+  "scripts": {
+    "setup:localforage": "copyfiles -f ./node_modules/localforage/dist/* ./www/assets/localforage",
+    "setup:lodash": "copyfiles -f ./node_modules/lodash/lodash.min.js ./www/assets/lodash",
+    "setup:font-awesome": "copyfiles -f ./node_modules/font-awesome/css/* ./www/assets/font-awesome/css && copyfiles -f ./node_modules/font-awesome/fonts/* ./www/assets/font-awesome/fonts",
+    "setup:framework7": "copyfiles -f ./node_modules/framework7/dist/js/* ./www/assets/framework7/js && copyfiles -f ./node_modules/framework7/dist/css/* ./www/assets/framework7/css && copyfiles -f ./node_modules/framework7/dist/img/* ./www/assets/framework7/img",
+    "setup": "npm-run-all --parallel 'setup:localforage' 'setup:lodash' 'setup:font-awesome' 'setup:framework7'",
+    "clean": "rimraf ./www/assets/localforage ./www/assets/lodash ./www/assets/font-awesome ./www/assets/framework7"
   }
 }

@@ -49,7 +49,7 @@
                         <div class="navbar-inner">
                             <div class="center">PropertyCross</div>
                             <div class="right">
-                                <a href="#" class="link">Faves</a>
+                                <a href="#" class="go-to-faves link">Faves</a>
                             </div>
                         </div>
                     </div>
@@ -78,10 +78,10 @@
                         <div id="search-buttons" class="content-block">
                             <div class="row">
                                 <div class="col-45">
-                                    <a id="do-search" href="#" class="button button-big button-fill color-green">Go</a>
+                                    <a id="search-by-term" href="#" class="button button-big button-fill color-green">Go</a>
                                 </div>
                                 <div class="col-45">
-                                    <a href="#" class="button button-big button-fill">My location</a>
+                                    <a id="search-by-position" href="#" class="button button-big button-fill">My location</a>
                                 </div>
                             </div>   
                         </div>
@@ -93,12 +93,12 @@
         </div>
     </div>
 
-    <script id="recent-searchs-template" type="text/template7">
+    <script id="recent-searches-template" type="text/template7">
         <div class="content-block-title">Recent searches:</div>
             <div class="list-block">
-                <ul class="recent-searchs">
-                    {{#each searchs}}
-                        <li class="item-content">
+                <ul class="searchable-list">
+                    {{#each searches}}
+                        <li class="item-content" data-term="{{term}}">
                             <div class="item-inner">
                                 <div class="item-title">{{term}}</div>
                                 <div class="item-after"><span class="badge">{{results}}</span></div>
@@ -109,29 +109,72 @@
             </div>
         </div>
     </script>
-    
-    <script src="assets/lodash/lodash.min.js"></script>
 
-    <!-- storage -->
+    <script id="main-locations-state-template" type="text/template7">
+        <div class="content-block-title">Please select a location below:</div>
+            <div class="list-block">
+                <ul class="searchable-list">
+                    {{#each locations}}
+                        <li class="item-content" data-term="{{place_name}}">
+                            <div class="item-inner">
+                                <div class="item-title">{{title}}</div>
+                            </div>
+                        </li>
+                    {{/each}}
+                </ul>
+            </div>
+        </div>
+    </script>
+
+    <script id="main-error-state-template" type="text/template7">
+        <div class="content-block">
+            <p style="color: #d9534f">{{errorMessage}}</p>
+        </div>
+    </script>
+
+    <script id="favourites-list-template" type="text/template7">
+        <ul id="favourites-list">
+            {{#each favourites}}
+                <li>
+                    <a href="#" class="item-link item-content property-item" data-index="{{@index}}">
+                        <div class="item-media">
+                            <img src="{{thumb_url}}" width="80">
+                        </div>
+                        <div class="item-inner">
+                            <div class="item-title-row">
+                                <div class="item-title">{{price_formatted}}</div>
+                            </div>
+                            <div class="item-text">{{title}}</div>
+                        </div>
+                    </a>
+                </li>
+            {{/each}}
+        </ul>
+    </script>
+    
+
+    <!-- services -->
+    <script src="assets/lodash/lodash.min.js"></script>
     <script src="assets/localforage/localforage.min.js"></script>
-    <script src="assets/js/storage.js"></script>
+    <script src="assets/js/recent-searches.js"></script>
+    <script src="assets/js/favourites-service.js"></script>
+
 
     <!-- Framework7 -->
     <script src="assets/framework7/js/framework7.min.js"></script>
     
     <script src="assets/js/init.js"></script>
-    <script src="assets/js/properties-api.js"></script>
+    <script src="assets/js/properties-service.js"></script>
     
     <script src="assets/js/home.js"></script>
     <script src="pages/results/results.js"></script>
+    <script src="pages/favourites/favourites.js"></script>
     <script src="pages/property-details/property-details.js"></script>
 
     <!-- 
         TODO:
         ===========
-        - Intial page (gps, errores, recent)
         - Favourites page
-        - Error en resutls loading more
         - Ver "back" para android (físico y navbar)
     -->
 </body>

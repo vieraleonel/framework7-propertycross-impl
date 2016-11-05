@@ -1,55 +1,206 @@
-(function (app, $$, ss, ps) {
+(function (app, T7, $$, rss, ps, constants, fs) {
     'use strict';
 
-    function showSearchProgress() {
-        app.showPreloader();
+    //////////////////////////
+    // private variables
+    //////////////////////////
+    
+    var searchTerm     = '',
+        loading        = false,
+        recentSearches = [],
+        state          = 1,
+        errorMessage   = '',
+        locations      = [],
+
+        errorStateCompiled     = T7.compile($$('#main-error-state-template').html()),
+        locationsStateCompiled = T7.compile($$('#main-locations-state-template').html());
+
+    //////////////////////////
+    // private functions
+    //////////////////////////
+
+    /**
+     * Get recent searches form storage
+     */
+    function getRecentSearches() {
+        rss.get(function(data) {
+            var html = window.recentSearchesCompiled({searches: data});
+            $$('.state-place').html(html);
+        });
     }
 
-    function showSearchButtons() {
+    /**
+     * Process Successfull data response from service
+     * 
+     * @param  Object data Returned service response
+     */
+    function processResponse(data) {
+
+        if (data.status === constants.PROPERTY_API.status.SUCCESS) {
+            showResultsPage(data);
+        }
+        else if (data.status === constants.PROPERTY_API.status.AMBIGUOUS) {
+            showLocationsState(data);
+        }
+        else { // error
+            showErrorState(data);
+        }
+    }
+
+    /**
+     * Navigates to results page
+     * 
+     * @param  Object data 
+     */
+    function showResultsPage(data) {
+        state        = 1;
+        locations    = [];
+        errorMessage = '';
+
+        // if search was by term, stores it in recent searches
+        if (searchTerm !== '') {
+            rss.store({
+                term: searchTerm,
+                results: data.results 
+            });
+        }
+
+        // prepare next page data
+        app.template7Data['page:results'] = ps.getLastQueryResults();
+        app.template7Data['page:results'].loadMore = {
+            label: 'Load more ...',
+            canLoad: app.template7Data['page:results'].page < app.template7Data['page:results'].pages
+        };
+
         app.hidePreloader();
+
+        window.mainView.router.loadPage('pages/results/results.html');
     }
 
-    $$('.view-main').on('click', '#do-search', function(event) {
+    /**
+     * Shows user a list to select a location
+     * 
+     * @param  Object data 
+     */
+    function showLocationsState(data) {
+        state     = 2; // ambiguous
+        locations = data.locations;
+
+        app.hidePreloader();
+
+        var html = locationsStateCompiled({locations: locations});
+        $$('.state-place').html(html);
+    }
+
+    /**
+     * Shows user a message for an error situation
+     * 
+     * @param  Object data
+     */
+    function showErrorState(data) {
+        state        = 0; // error
+        errorMessage = data.message;
+
+        app.hidePreloader();
+
+        var html = errorStateCompiled({errorMessage: errorMessage});
+        $$('.state-place').html(html);
+    }
+
+    /**
+     * Perform a term based search with de selected location (from location state)
+     * 
+     * @param  Object location
+     */
+    function doSearchByTerm(location) {
+        app.showPreloader();
+
+        ps.searchByTerm(searchTerm, searchByTermSuccess, searchByTermError);
+
+        function searchByTermSuccess(data) {
+            processResponse(data);
+        }
+
+        function searchByTermError(data) {
+            showErrorState({message: 'Other error'});
+        }
+    }
+
+    /**
+     * Perform a term based search with de selected location (from location state)
+     * 
+     * @param  Object location
+     */
+    function doSearchWith(location) {
+        state        = 1;
+        locations    = [];
+        errorMessage = '';
+        searchTerm   = location;
+
+        $$('#search-text').val(searchTerm);
+
+        doSearchByTerm();
+    }
+
+    /**
+     * Loads favourite page
+     */
+    function goToFavesPage() {
+
+        fs.getAll(favouritesSuccess);
+
+        function favouritesSuccess(faves) {
+            // prepare next page data
+            app.template7Data['page:favourites'] = {favourites: faves};
+            
+            window.mainView.router.loadPage('pages/favourites/favourites.html');
+        }
+
+    }
+
+    //////////////////////////
+    // Events
+    //////////////////////////
+
+    $$('.view-main').on('click', '.searchable-list .item-content', function(event) {
         event.preventDefault();
 
-        showSearchProgress();
-
-        var searchTerm = $$('#search-text').val();
-
-        ps.searchProperties(
-            searchTerm, 1, 
-            function(data, status, xhr) {
-
-                if (data.response.application_response_code == 100 || 
-                    data.response.application_response_code == 101 ||
-                    data.response.application_response_code == 110) {
-
-                    app.template7Data['page:results'] = {
-                        page: 1,
-                        pages: data.response.total_pages,
-                        more: data.response.page < data.response.total_pages,
-                        searchTerm: searchTerm,
-                        showing: data.response.listings.length,
-                        results: data.response.total_results,
-                        properties: data.response.listings
-                    }
-
-                    ss.addRecentSearch({
-                        term: searchTerm,
-                        results: data.response.total_results
-                    });
-
-                    mainView.router.loadPage('pages/results/results.html');
-                } else {
-                    alert(error);
-                }
-            },
-            null,
-            function() {
-                showSearchButtons();
-            }
-        );
+        doSearchWith($$(this).attr('data-term'));
     });
+
+    $$('.view-main').on('click', '#search-by-term', function(event) {
+        event.preventDefault();
+
+        searchTerm = $$('#search-text').val();
+
+        doSearchByTerm();
+    });
+
+    $$('.view-main').on('click', '#search-by-position', function(event) {
+        event.preventDefault();
+
+        app.showPreloader();
+
+        ps.searchByPosition(searchByPositionSuccess, searchByPositionError);
+
+        function searchByPositionSuccess(data) {
+            processResponse(data);
+        }
+
+        function searchByPositionError(error) {
+            showErrorState(error);
+        }
+    });
+
+    $$('.view-main').on('click', '.go-to-faves', function(event){
+       event.preventDefault();
+       
+       goToFavesPage(); 
+    });
+
+    //////////////////////////
+    // page config
+    //////////////////////////
 
     app.onPageBeforeInit('main', function(page) {
         if (isIos) {
@@ -57,12 +208,7 @@
         }
     });
 
-    app.onPageBeforeAnimation('main', function(page){
-        ss.getRecentSearchs()
-            .then(function(recentSearchs){
-                window.rr = recentSearchs;
-                var html = recentSearchsCompiled({searchs: recentSearchs});
-                $$('.state-place').html(html);
-            });
+    app.onPageBeforeAnimation('main', function(page) {
+        getRecentSearches();
     });
-})(app, Dom7, storageService, propertiesService);
+})(app, Template7, Dom7, recentSearchesService, propertiesService, appConstants, favouritesService);

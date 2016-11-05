@@ -44,12 +44,12 @@
                     </li>
                 {{/each}}
 
-                {{#if more}}
+                {{#if loadMore.canLoad}}
                     <li>
                         <a id="load-more-results" href="#" class="item-link item-content">
                             <div class="item-inner">
                                 <div class="item-title-row">
-                                    <div class="item-title">Load more …</div>
+                                    <div class="item-title">{{loadMore.label}}</div>
                                 </div>
                                 <div class="item-text">Results for {{searchTerm}}, showing {{showing}} of {{results}} properties</div>
                             </div>

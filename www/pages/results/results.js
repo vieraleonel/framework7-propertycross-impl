@@ -1,53 +1,69 @@
-(function($$, T7, app, ps) {
+(function($$, T7, app, ps, fs) {
     'use strict';
 
-    /**
-     * Returns next page. Checks if current page is last
-     * @return string page (nestoria pages are strings)
-     */
-    function getNextPage() {
-        return (app.template7Data['page:results'].page < app.template7Data['page:results'].pages ? app.template7Data['page:results'].page + 1 : app.template7Data['page:results'].pages);
-    }
+    function toggleLoadMore() {
+        var loadMoreText = $$('#load-more-results .item-title').html('Loading...');
 
-    function loadMore() {
-        if (app.template7Data['page:results'].page < app.template7Data['page:results'].pages) {
-            ps.searchProperties(
-                app.template7Data['page:results'].searchTerm, 
-                getNextPage(), 
-                function(data, status, xhr) {
-
-                    if (data.response.application_response_code == 100 || 
-                        data.response.application_response_code == 101 ||
-                        data.response.application_response_code == 110) {
-
-                        app.template7Data['page:results'].page       = data.response.page;
-                        app.template7Data['page:results'].more       = data.response.page < data.response.total_pages;
-                        app.template7Data['page:results'].properties = app.template7Data['page:results'].properties.concat(data.response.listings);
-                        app.template7Data['page:results'].showing    = app.template7Data['page:results'].properties.length;
-
-                        mainView.router.refreshPage();
-                    } else {
-                        alert(error);
-                    }
-                }
-            );
+        if (loadMoreText === 'Loading...') {
+            $$('#load-more-results .item-title').html('Load more ...');
+        } else {
+            $$('#load-more-results .item-title').html('Loading...');
         }
     }
 
+    /**
+     * get more results from last query
+     */
+    function getMoreProperties() {
+        toggleLoadMore();
+
+        ps.loadMore(loadMoreResultsSuccess, loadMoreResultsError);
+
+        function loadMoreResultsSuccess(data) {
+            
+            app.template7Data['page:results'] = data;
+            app.template7Data['page:results'].loadMore = {
+                label: 'Load more ...',
+                canLoad: data.page < data.pages
+            };
+            
+            mainView.router.refreshPage();
+        }
+
+        function loadMoreResultsError(error) {
+            toggleLoadMore();
+            alert(error.message);
+        }
+    }
+
+    function goToPropertyDetails(property) {
+
+        fs.isFav(property, isFavSuccess, null);
+
+        function isFavSuccess(isFav) {
+            property.isFav = isFav;
+            app.template7Data['page:property-details'] = property;
+            mainView.loadPage('pages/property-details/property-datails.html');
+        }
+    }
+
+
     app.onPageInit('results', function(page) {
 
+        // go to property details event
         $$('#results-list').on('click', '.property-item', function(event) {
+            event.preventDefault();
+            
             var index = $$(this).data('index');
-            app.template7Data['page:property-details'] = app.template7Data['page:results'].properties[index];
-            mainView.loadPage('pages/property-details/property-datails.html');
+
+            goToPropertyDetails(app.template7Data['page:results'].properties[index]);
         });
 
+        // load more event
         $$('#load-more-results').on('click', function(event){
             event.preventDefault();
 
-            $$('#load-more-results .item-title').html('Loading...');
-
-            loadMore();
+            getMoreProperties();
         }); 
     });
-})(Dom7, Template7, app, propertiesService);
+})(Dom7, Template7, app, propertiesService, favouritesService);

@@ -1,4 +1,7 @@
-<!-- We don't need full layout in this file because this page will be parsed with Ajax. It is just enough to put here .navbar and .page-->
+<!-- 
+    We don't need full layout in this file because this page will be 
+    parsed with Ajax. It is just enough to put here .navbar and .page
+-->
  
 {{#if @global.ios}}
 <!-- Top Navbar-->
@@ -12,7 +15,11 @@
         <div class="center">Property Details</div>
         <div class="right">
             <a href="#" class="link icon-only fav-property">
-                <i class="fa fa-star-o fa-lg"></i>
+                {{#if isFav}}
+                    <i class="fa fa-star fa-lg"></i>
+                {{else}}
+                    <i class="fa fa-star-o fa-lg"></i>
+                {{/if}}
             </a>
         </div>
     </div>
@@ -33,7 +40,11 @@
 
         <!-- Floating Action Button -->
         <a href="#" class="floating-button fav-property color-pink">
-            <i class="fa fa-star-o fa-2x"></i>
+            {{#if isFav}}
+                <i class="fa fa-star fa-2x"></i>
+            {{else}}
+                <i class="fa fa-star-o fa-2x"></i>
+            {{/if}}
         </a>
     {{/if}}
     

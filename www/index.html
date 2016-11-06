@@ -133,23 +133,33 @@
     </script>
 
     <script id="favourites-list-template" type="text/template7">
-        <ul id="favourites-list">
-            {{#each favourites}}
-                <li>
-                    <a href="#" class="item-link item-content property-item" data-index="{{@index}}">
-                        <div class="item-media">
-                            <img src="{{thumb_url}}" width="80">
-                        </div>
-                        <div class="item-inner">
-                            <div class="item-title-row">
-                                <div class="item-title">{{price_formatted}}</div>
+        <div class="list-block media-list">
+            <ul id="favourites-list">
+                {{#each favourites}}
+                    <li>
+                        <a href="#" class="item-link item-content property-item" data-index="{{@index}}">
+                            <div class="item-media">
+                                <img src="{{thumb_url}}" width="80">
                             </div>
-                            <div class="item-text">{{title}}</div>
-                        </div>
-                    </a>
-                </li>
-            {{/each}}
-        </ul>
+                            <div class="item-inner">
+                                <div class="item-title-row">
+                                    <div class="item-title">{{price_formatted}}</div>
+                                </div>
+                                <div class="item-text">{{title}}</div>
+                            </div>
+                        </a>
+                    </li>
+                {{else}}
+                    <li>
+                        <a href="#" class="item-content property-item">
+                            <div class="item-inner">
+                                <div class="item-text">You have not added any properties to your favourites</div>
+                            </div>
+                        </a>
+                    </li>
+                {{/each}}
+            </ul>
+        </div>
     </script>
     
     <script src="cordova.js"></script>
